@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?define ConfigurationName = "Release" ?>
+
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi"
+     xmlns:wixutil="http://schemas.microsoft.com/wix/UtilExtension"
+     xmlns:wixcp="http://schemas.microsoft.com/wix/ComPlusExtension"
+     xmlns:wixnetfx="http://schemas.microsoft.com/wix/NetFxExtension">
+  <Product Id="*" Name="TEST Services 1.0.0.0" Language="1033" Version="1.0.0.0"
+             Manufacturer="Systems, Inc." UpgradeCode="99794AD0-ADF0-439c-8965-6354D0ADEFF4">
+    <Package InstallerVersion="200" Compressed="yes" />
+
+    <Media Id="1" Cabinet="media1.cab" EmbedCab="yes" CompressionLevel="high" />
+
+    <Property Id="ALLUSERS" Value="1" />
+
+    <Property Id="ACCOUNT">
+      <RegistrySearch Id="ACCOUNT.RegistrySearch" Root="HKCU"
+                      Key="Software\TEST\InstallInfo"
+                      Name="ServiceAccount" Type="raw"/>
+    </Property>
+
+    <Upgrade Id="{99794AD0-ADF0-439c-8965-6354D0ADEFF4}">
+      <UpgradeVersion
+        Minimum="1.0.0.0" Maximum="99.0.0.0"
+        Property="PREVIOUSVERSIONSINSTALLED"
+        IncludeMinimum="yes" IncludeMaximum="no" />
+      <UpgradeVersion Minimum="1.0.0.0" IncludeMinimum="yes" OnlyDetect ="yes" Property="NEWERVERSIONDETECTED" />
+    </Upgrade>
+
+    <Directory Id="TARGETDIR" Name="SourceDir">
+
+      <Directory Id="ProgramMenuFolder" >
+        <Directory Id="TESTStartMenu" Name="TEST Services" >
+          <Component Id="TESTCreateFolder" Guid="{AC03F469-8FBE-4BB5-A1A5-F0A9D502D4A6}">
+            <RegistryKey Root="HKCU" Key="Software\TEST\InstallInfo">
+              <RegistryValue Value="StartMenuFolder" Type="string" KeyPath="yes" />
+            </RegistryKey>
+            <CreateFolder />
+            <RemoveFolder Id="RemoveShortcutFolder" On="uninstall"/>
+          </Component>
+          <Component Id="UninstallShortcutComponent" Guid="{44C23603-168E-4CA8-A155-A036B056F705}" >
+            <RegistryKey Root="HKCU" Key="Software\TEST\InstallInfo">
+              <RegistryValue Value="StartMenuFolder" Type="string" KeyPath="yes" />
+            </RegistryKey>
+            <Shortcut Id="UninstallProduct" Name="Uninstall TEST Services"
+                      Target="[System32Folder]msiexec.exe" Arguments="/x [ProductCode]"
+                      Directory="TESTStartMenu" Description="Uninstalls TEST Services" />
+          </Component>
+        </Directory>
+      </Directory>
+
+      <Directory Id="ProgramFilesFolder">
+        <Directory Id ="CompanyName" Name="Systems">
+          <Directory Id="INSTALLLOCATION" Name="TEST Services">
+            <Component Id="TESTFolder" Guid="{B7D14C0A-545D-42EE-8EBB-E2F3D4336AA5}">
+              <CreateFolder>
+              </CreateFolder>
+            </Component>
+          </Directory>
+        </Directory>
+      </Directory>
+    </Directory>
+
+    <Feature Id="ProductFeature" Title="AlohaOnlineAsyncServiceInstall" Level="1"
+             Description="Install the Aloha Online Ordering background service">
+      <ComponentRef Id="TESTCreateFolder"/>
+      <ComponentRef Id="UninstallShortcutComponent"/>
+
+      <ComponentRef Id="TESTFolder"/>
+    </Feature>
+
+    <Property Id="WIXUI_INSTALLDIR" Value="INSTALLLOCATION" />
+    <Property Id="LicenseAccepted" Value="1" />
+
+    <!-- Define custom UI sequence to skip license agreement dialog -->
+    <UI>
+      <TextStyle Id="WixUI_Font_Normal" FaceName="Tahoma" Size="8" />
+      <TextStyle Id="WixUI_Font_Bigger" FaceName="Tahoma" Size="12" />
+      <TextStyle Id="WixUI_Font_Title" FaceName="Tahoma" Size="9" Bold="yes" />
+
+      <Property Id="DefaultUIFont" Value="WixUI_Font_Normal" />
+      <Property Id="WixUI_Mode" Value="InstallDir" />
+
+      <DialogRef Id="BrowseDlg" />
+      <DialogRef Id="DiskCostDlg" />
+      <DialogRef Id="ErrorDlg" />
+      <DialogRef Id="FatalError" />
+      <DialogRef Id="FilesInUse" />
+      <DialogRef Id="MsiRMFilesInUse" />
+      <DialogRef Id="PrepareDlg" />
+      <DialogRef Id="ProgressDlg" />
+      <DialogRef Id="ResumeDlg" />
+      <DialogRef Id="UserExit" />
+
+      <Publish Dialog="BrowseDlg" Control="OK" Event="DoAction" Value="WixUIValidatePath" Order="3">1</Publish>
+      <Publish Dialog="BrowseDlg" Control="OK" Event="SpawnDialog" Value="InvalidDirDlg" Order="4"><![CDATA[WIXUI_INSTALLDIR_VALID<>"1"]]></Publish>
+
+      <Publish Dialog="ExitDialog" Control="Finish" Event="EndDialog" Value="Return" Order="999">1</Publish>
+
+      <Publish Dialog="WelcomeDlg" Control="Next" Event="NewDialog" Value="InstallDirDlg">1</Publish>
+
+      <Publish Dialog="InstallDirDlg" Control="Back" Event="NewDialog" Value="WelcomeDlg">1</Publish>
+      <Publish Dialog="InstallDirDlg" Control="Next" Event="SetTargetPath" Value="[WIXUI_INSTALLDIR]" Order="1">1</Publish>
+      <Publish Dialog="InstallDirDlg" Control="Next" Event="DoAction" Value="WixUIValidatePath" Order="2">NOT WIXUI_DONTVALIDATEPATH</Publish>
+      <Publish Dialog="InstallDirDlg" Control="Next" Event="SpawnDialog" Value="InvalidDirDlg" Order="3"><![CDATA[NOT WIXUI_DONTVALIDATEPATH AND WIXUI_INSTALLDIR_VALID<>"1"]]></Publish>
+      <Publish Dialog="InstallDirDlg" Control="Next" Event="NewDialog" Value="ServiceAccountDlg" Order="4">WIXUI_DONTVALIDATEPATH OR WIXUI_INSTALLDIR_VALID="1"</Publish>
+      <Publish Dialog="InstallDirDlg" Control="ChangeFolder" Property="_BrowseProperty" Value="[WIXUI_INSTALLDIR]" Order="1">1</Publish>
+      <Publish Dialog="InstallDirDlg" Control="ChangeFolder" Event="SpawnDialog" Value="BrowseDlg" Order="2">1</Publish>
+
+      <Publish Dialog="ServiceAccountDlg" Control="Back" Event="NewDialog" Value="InstallDirDlg">1</Publish>
+      <Publish Dialog="ServiceAccountDlg" Control="Next" Event="NewDialog" Value="VerifyReadyDlg">1</Publish>
+
+      <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="InstallDirDlg" Order="1">NOT Installed</Publish>
+      <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="MaintenanceTypeDlg" Order="2">Installed</Publish>
+
+      <Publish Dialog="MaintenanceWelcomeDlg" Control="Next" Event="NewDialog" Value="MaintenanceTypeDlg">1</Publish>
+
+      <Publish Dialog="MaintenanceTypeDlg" Control="RepairButton" Event="NewDialog" Value="VerifyReadyDlg">1</Publish>
+      <Publish Dialog="MaintenanceTypeDlg" Control="RemoveButton" Event="NewDialog" Value="VerifyReadyDlg">1</Publish>
+      <Publish Dialog="MaintenanceTypeDlg" Control="Back" Event="NewDialog" Value="MaintenanceWelcomeDlg">1</Publish>
+
+      <Property Id="ARPNOMODIFY" Value="1" />
+
+      <Dialog Id="ServiceAccountDlg" Width="370" Height="270" Title="[ProductName] Setup">
+        <Control Id="Back" Type="PushButton" X="180" Y="243" Width="56" Height="17" Text="!(loc.WixUIBack)" />
+        <Control Id="Next" Type="PushButton" X="236" Y="243" Width="56" Height="17" Default="yes" Text="!(loc.WixUINext)">
+          <Condition Action="disable"><![CDATA[ACCOUNT = "" OR PASSWORD = ""]]></Condition>
+          <Condition Action="enable">ACCOUNT &lt;&gt; "" AND PASSWORD &lt;&gt; ""</Condition>
+        </Control>
+        <Control Id="Cancel" Type="PushButton" X="304" Y="243" Width="56" Height="17" Cancel="yes" Text="!(loc.WixUICancel)">
+          <Publish Event="SpawnDialog" Value="CancelDlg">1</Publish>
+        </Control>
+        <Control Id="BannerBitmap" Type="Bitmap" X="0" Y="0" Width="370" Height="44" TabSkip="no" Text="WixUI_Bmp_Banner" />
+        <Control Id="BannerLine" Type="Line" X="0" Y="44" Width="370" Height="0" />
+        <Control Id="BottomLine" Type="Line" X="0" Y="234" Width="370" Height="0" />
+        <Control Id="Description" Type="Text" X="25" Y="23" Width="280" Height="15" Transparent="yes" NoPrefix="yes" Text="Enter service account details.">
+        </Control>
+        <Control Id="Title" Type="Text" X="15" Y="6" Width="200" Height="15" Transparent="yes" NoPrefix="yes" Text="{\WixUI_Font_Title}Service account" />
+        <Control Type="Text" Width="322" Height="26" X="25" Y="56" Id="BodyLabel" Text="Specify the logon account for the [ProductName] service." NoPrefix="yes">
+        </Control>
+        <Control Type="Text" Width="275" Height="10" X="25" Y="98" Id="AccountLabel" Text="&amp;Account name (Example: domain\user or user@domain):" />
+        <Control Type="Edit" Width="194" Height="15" X="25" Y="111" Id="AccountTextbox" Property="ACCOUNT" />
+        <Control Type="Text" Width="275" Height="10" X="25" Y="135" Id="PasswordLabel" Text="Pa&amp;ssword:" />
+        <Control Type="Edit" Width="194" Height="15" X="25" Y="148" Id="PasswordTextbox" Property="PASSWORD" Password="yes" />
+        <!--<Control Width="12" Height="12" FixedSize="yes" Type="Bitmap" X="25" Y="170" Id="Warning" Text="WarningIcon"/>-->
+        <Control Id="WarningLabel" Type="Text" X="40" Y="170" Width="200" Height="40" Text="The account entered here will not be validated. Make sure that the account details entered are correct." />
+      </Dialog>
+
+    </UI>
+
+
+    <UIRef Id="WixUI_Common" />
+
+    <PropertyRef Id="NETFRAMEWORK35"/>
+    <Condition Message="This application requires .NET Framework 3.5. Please install the .NET Framework then run this installer again.">
+      <![CDATA[Installed OR NETFRAMEWORK35]]>
+    </Condition>
+
+    <CustomAction Id="SetMACHINENAME" Property="ACCOUNT" Value="[ComputerName]\" />
+
+    <InstallUISequence>
+      <Custom Action="SetMACHINENAME" After="AppSearch"><![CDATA[ACCOUNT = ""]]> </Custom>
+    </InstallUISequence>
+
+    <InstallExecuteSequence>
+      <RemoveExistingProducts After="InstallInitialize" />
+    </InstallExecuteSequence>
+
+  </Product>
+</Wix>

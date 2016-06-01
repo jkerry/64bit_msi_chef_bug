@@ -1,0 +1,20 @@
+---
+driver:
+  name: vagrant
+provisioner:
+  name: chef_zero
+transport:
+  name: winrm
+  elevated: true
+verifier:
+  name: inspec
+platforms:
+  - name: windows_2008_r2
+    driver_config:
+      box: jkerry/win2k8r2
+      gui: true
+suites:
+  - name: databases
+    run_list:
+      - recipe[64bitSvcInstallBug::default]
+    attributes:

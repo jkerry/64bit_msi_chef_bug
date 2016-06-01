@@ -1,0 +1,6 @@
+c:\tmp\64bchefbug\winservice\ExampleWindowsService\ExampleWindowsService\bin\Debug\ExampleWindowsService.exe.config
+c:\tmp\64bchefbug\winservice\ExampleWindowsService\ExampleWindowsService\bin\Debug\ExampleWindowsService.exe
+c:\tmp\64bchefbug\winservice\ExampleWindowsService\ExampleWindowsService\bin\Debug\ExampleWindowsService.pdb
+c:\tmp\64bchefbug\winservice\ExampleWindowsService\ExampleWindowsService\obj\Debug\ExampleWindowsService.csprojResolveAssemblyReference.cache
+c:\tmp\64bchefbug\winservice\ExampleWindowsService\ExampleWindowsService\obj\Debug\ExampleWindowsService.exe
+c:\tmp\64bchefbug\winservice\ExampleWindowsService\ExampleWindowsService\obj\Debug\ExampleWindowsService.pdb

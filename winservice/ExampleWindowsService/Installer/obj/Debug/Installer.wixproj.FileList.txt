@@ -1,0 +1,6 @@
+c:\tmp\64bchefbug\winservice\ExampleWindowsService\Installer\bin\Debug\Installer.msi
+c:\tmp\64bchefbug\winservice\ExampleWindowsService\Installer\bin\Debug\Installer.wixpdb
+obj\Debug\Product.wixobj
+obj\Debug\Installer.wixproj.BindContentsFileListnull.txt
+obj\Debug\Installer.wixproj.BindOutputsFileListnull.txt
+obj\Debug\Installer.wixproj.BindBuiltOutputsFileListnull.txt

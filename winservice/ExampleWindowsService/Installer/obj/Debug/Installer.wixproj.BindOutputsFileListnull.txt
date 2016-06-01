@@ -1,0 +1,2 @@
+c:\tmp\64bchefbug\winservice\ExampleWindowsService\Installer\bin\Debug\Installer.msi
+c:\tmp\64bchefbug\winservice\ExampleWindowsService\Installer\bin\Debug\Installer.wixpdb
